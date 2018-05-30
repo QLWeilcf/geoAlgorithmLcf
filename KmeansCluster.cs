@@ -3,14 +3,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+/*C#下的kmeans实现，主要处理行数比较多的数据，所以采用float省内存，而不是用double；
+*代码思路主要来自《机器学习实战》
+*
+*
+**/
 
 namespace KMeansClusterInCS {
     class KmeansCluster {
-        int _N;    //
-        int _K;    //
-        private float[][] _centroids;
-        private float[][] _ctsCopy;
-        private bool cv = false;
+        int _N;    //聚类数据的维数例如[lng,lat]是二维
+        int _K;    //聚类中心个数，kmeans中的k
+        private float[][] _centroids; //质心集合
+        private float[][] _ctsCopy; //质心的一份拷贝
+        private bool cv = false; //质心不改变时（目前采用逻辑0而不是==）
+		private List<float[]> allDlst = new List<float[]>();//为省内存不用double
+		
         public KmeansCluster () {
             _N = 2;
             _K = 3;
@@ -19,10 +26,33 @@ namespace KMeansClusterInCS {
             _N = n;
             _K = k;
         }
+		public N{
+			get{ return _N;
+			}
+		}
 
-
-        private List<float[]> allDlst = new List<float[]>();//为省内存不用double
-
+		#region 公共调用部分
+		//一键式调用
+		public void toCluster () {
+            List<float[]> allTwo = cluster();
+            listFloatToCsv(allTwo);
+        }
+		
+        public void listFloatToCsv (List<float[]> allT) {
+            string spath = @"D:/python_works/testSet4_out.csv";
+            StreamWriter swt = new StreamWriter(spath);
+            foreach (float[] a in allT) {
+                string outxt = FloatLstToStr(a);
+                swt.WriteLine(outxt);
+            }
+            swt.Close();
+        }
+		
+		
+		
+		#endregion
+        
+		#region 私有函数
         public void loadData (string filenm) {
             //目前只针对二维的，想改进，之后再说吧
             StreamReader csvRder = new StreamReader(filenm);
@@ -178,19 +208,7 @@ namespace KMeansClusterInCS {
             return otxt;
         }
 
-        public void toCluster () {
-            List<float[]> allTwo = cluster();
-            listFloatToCsv(allTwo);
-        }
-        public void listFloatToCsv (List<float[]> allT) {
-            string spath = @"D:/python_works/testSet4_out.csv";
-            StreamWriter swt = new StreamWriter(spath);
-            foreach (float[] a in allT) {
-                string outxt = FloatLstToStr(a);
-                swt.WriteLine(outxt);
-            }
-            swt.Close();
-        }
 
+		#endregion
     }
 }
